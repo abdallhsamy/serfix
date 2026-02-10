@@ -41,8 +41,9 @@ export function signToken(payload: TokenPayload): string {
 
 export function verifyToken(token: string): TokenPayload {
   try {
-    const decoded = jwt.verify(token, config.jwt.secret) as TokenPayload & { iat?: number; exp?: number };
-    return { userId: decoded.userId, email: decoded.email, role: decoded.role };
+    const { userId, email, role } =
+        jwt.verify(token, config.jwt.secret) as TokenPayload & { iat?: number; exp?: number };
+    return { userId, email, role };
   } catch {
     throw new AppError(401, 'Invalid or expired token', 'UNAUTHORIZED');
   }
