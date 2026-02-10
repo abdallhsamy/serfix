@@ -102,6 +102,7 @@ All configuration is read from `.env`; no values are hardcoded in the Compose fi
 
 - **PostgreSQL** runs as a separate service; `DATABASE_URL` for the app is built from `POSTGRES_*` and the `postgres` hostname inside the network.
 - **App** runs migrations on startup, then listens on `PORT` (default 3000). API: `http://localhost:3000` (or your `PORT`). Swagger: `http://localhost:3000/api-docs`.
+- **pgAdmin** is available at `http://localhost:5050` (or your `PGADMIN_PORT`). Log in with `PGADMIN_DEFAULT_EMAIL` and `PGADMIN_DEFAULT_PASSWORD` (default: `admin@example.com` / `admin`). Use a valid email format (e.g. `user@example.com`); pgAdmin rejects addresses like `admin@localhost`. Add a server: host `postgres`, port `5432`, username `POSTGRES_USER`, password `POSTGRES_PASSWORD`, database `POSTGRES_DB`.
 
 ## API documentation (Swagger)
 
