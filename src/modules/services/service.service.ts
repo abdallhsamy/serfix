@@ -1,5 +1,6 @@
 import { PrismaClient, Prisma } from '@prisma/client';
 import { AppError } from '../../middleware/errorHandler';
+import { ErrorCodes } from "../../constants/errorCodes";
 
 const prisma = new PrismaClient();
 
@@ -29,7 +30,7 @@ export interface UpdateServiceInput {
 
 function validateSlug(slug: string): void {
   if (!SLUG_REGEX.test(slug)) {
-    throw new AppError(400, 'Slug must be URL-safe lowercase with hyphens (e.g. my-service)', 'VALIDATION_ERROR');
+    throw new AppError(400, 'Slug must be URL-safe lowercase with hyphens (e.g. my-service)', ErrorCodes.ValidationError);
   }
 }
 
@@ -48,7 +49,7 @@ export async function listServices(query: ListServicesQuery) {
 export async function getServiceById(id: string) {
   const service = await prisma.service.findUnique({ where: { id } });
   if (!service) {
-    throw new AppError(404, 'Service not found', 'NOT_FOUND');
+    throw new AppError(404, 'Service not found', ErrorCodes.NotFound);
   }
   return service;
 }
@@ -56,7 +57,7 @@ export async function getServiceById(id: string) {
 export async function getServiceBySlug(slug: string) {
   const service = await prisma.service.findUnique({ where: { slug } });
   if (!service) {
-    throw new AppError(404, 'Service not found', 'NOT_FOUND');
+    throw new AppError(404, 'Service not found', ErrorCodes.NotFound);
   }
   return service;
 }
@@ -65,7 +66,7 @@ export async function createService(data: CreateServiceInput) {
   validateSlug(data.slug);
   const existing = await prisma.service.findUnique({ where: { slug: data.slug } });
   if (existing) {
-    throw new AppError(409, 'Service with this slug already exists', 'CONFLICT');
+    throw new AppError(409, 'Service with this slug already exists', ErrorCodes.Conflict);
   }
   return prisma.service.create({
     data: {
@@ -82,12 +83,12 @@ export async function updateService(id: string, data: UpdateServiceInput) {
   if (data.slug !== undefined) validateSlug(data.slug);
   const existing = await prisma.service.findUnique({ where: { id } });
   if (!existing) {
-    throw new AppError(404, 'Service not found', 'NOT_FOUND');
+    throw new AppError(404, 'Service not found', ErrorCodes.NotFound);
   }
   if (data.slug !== undefined && data.slug !== existing.slug) {
     const slugTaken = await prisma.service.findUnique({ where: { slug: data.slug } });
     if (slugTaken) {
-      throw new AppError(409, 'Service with this slug already exists', 'CONFLICT');
+      throw new AppError(409, 'Service with this slug already exists', ErrorCodes.Conflict);
     }
   }
   const updateData: Prisma.ServiceUpdateInput = {
@@ -106,7 +107,7 @@ export async function updateService(id: string, data: UpdateServiceInput) {
 export async function deleteService(id: string) {
   const existing = await prisma.service.findUnique({ where: { id } });
   if (!existing) {
-    throw new AppError(404, 'Service not found', 'NOT_FOUND');
+    throw new AppError(404, 'Service not found', ErrorCodes.NotFound);
   }
   await prisma.service.delete({ where: { id } });
   return { deleted: true };

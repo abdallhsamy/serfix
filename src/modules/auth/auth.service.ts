@@ -3,6 +3,7 @@ import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { config } from '../../config/env';
 import { AppError } from '../../middleware/errorHandler';
+import { ErrorCodes } from "../../constants/errorCodes";
 
 const prisma = new PrismaClient();
 
@@ -45,14 +46,14 @@ export function verifyToken(token: string): TokenPayload {
         jwt.verify(token, config.jwt.secret) as TokenPayload & { iat?: number; exp?: number };
     return { userId, email, role };
   } catch {
-    throw new AppError(401, 'Invalid or expired token', 'UNAUTHORIZED');
+    throw new AppError(401, 'Invalid or expired token', ErrorCodes.Unauthorized);
   }
 }
 
 export async function register(data: RegisterInput) {
   const existing = await prisma.user.findUnique({ where: { email: data.email } });
   if (existing) {
-    throw new AppError(409, 'Email already registered', 'CONFLICT');
+    throw new AppError(409, 'Email already registered', ErrorCodes.Conflict);
   }
   const passwordHash = await hashPassword(data.password);
   const user = await prisma.user.create({
@@ -66,11 +67,11 @@ export async function register(data: RegisterInput) {
 export async function login(data: LoginInput) {
   const user = await prisma.user.findUnique({ where: { email: data.email } });
   if (!user) {
-    throw new AppError(401, 'Invalid email or password', 'UNAUTHORIZED');
+    throw new AppError(401, 'Invalid email or password', ErrorCodes.Unauthorized);
   }
   const valid = await verifyPassword(data.password, user.passwordHash);
   if (!valid) {
-    throw new AppError(401, 'Invalid email or password', 'UNAUTHORIZED');
+    throw new AppError(401, 'Invalid email or password', ErrorCodes.Unauthorized);
   }
   const accessToken = signToken({ userId: user.id, email: user.email, role: user.role });
   return {

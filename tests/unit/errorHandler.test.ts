@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { errorHandler, AppError } from '../../src/middleware/errorHandler';
+import { ErrorCodes } from "../../src/constants/errorCodes";
 
 jest.mock('../../src/utils/logger', () => ({
   logger: { error: jest.fn(), info: jest.fn(), warn: jest.fn() },
@@ -19,7 +20,7 @@ describe('errorHandler', () => {
   });
 
   it('sends AppError status and message with code', () => {
-    const err = new AppError(404, 'Not found', 'NOT_FOUND');
+    const err = new AppError(404, 'Not found', ErrorCodes.NotFound);
     errorHandler(err, mockReq as Request, mockRes as Response, () => {});
     expect(statusMock).toHaveBeenCalledWith(404);
     expect(jsonMock).toHaveBeenCalledWith({
@@ -29,7 +30,7 @@ describe('errorHandler', () => {
   });
 
   it('sends 400 for validation error', () => {
-    const err = new AppError(400, 'Invalid input', 'VALIDATION_ERROR');
+    const err = new AppError(400, 'Invalid input', ErrorCodes.ValidationError);
     errorHandler(err, mockReq as Request, mockRes as Response, () => {});
     expect(statusMock).toHaveBeenCalledWith(400);
     expect(jsonMock).toHaveBeenCalledWith(
