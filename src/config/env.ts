@@ -12,7 +12,7 @@ function env(key: string, defaultValue?: string): string {
 
 export const config = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
-  port: parseInt(process.env.PORT ?? '3000', 10),
+  port: Number.parseInt(process.env.PORT ?? '3000', 10),
   databaseUrl: env('DATABASE_URL'),
   jwt: {
     secret: env('JWT_SECRET'),
@@ -22,9 +22,9 @@ export const config = {
     origins: process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()) ?? ['http://localhost:3000'],
   },
   rateLimit: {
-    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS ?? '900000', 10),
-    max: process.env.NODE_ENV === 'test' ? 10000 : parseInt(process.env.RATE_LIMIT_MAX ?? '100', 10),
-    authMax: process.env.NODE_ENV === 'test' ? 10000 : parseInt(process.env.RATE_LIMIT_AUTH_MAX ?? '10', 10),
+    windowMs: Number.parseInt(process.env.RATE_LIMIT_WINDOW_MS ?? '900000', 10),
+    max: process.env.NODE_ENV === 'test' ? 10000 : Number.parseInt(process.env.RATE_LIMIT_MAX ?? '100', 10),
+    authMax: process.env.NODE_ENV === 'test' ? 10000 : Number.parseInt(process.env.RATE_LIMIT_AUTH_MAX ?? '10', 10),
   },
 } as const;
 
